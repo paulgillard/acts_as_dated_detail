@@ -9,26 +9,28 @@ module ActiveRecord
         def acts_as_dated(options = {})
           acts_as_dated_detail_class = "#{self.name}DatedDetail".constantize
           
-          # tracked_attribute_reader_methods = ''
+          tracked_attribute_reader_methods = ''
           # tracked_attribute_writer_methods = ''
-          # acts_as_dated_detail_class.tracked_attributes.each do |attribute|
-          #   tracked_attribute_reader_methods << %(
-          #     def #{attribute}
-          #       detail.send('#{attribute}')
-          #     end
-          #   )
+          acts_as_dated_detail_class.tracked_attributes.each do |attribute|
+            tracked_attribute_reader_methods << %(
+              def #{attribute}
+                dated_detail.send('#{attribute}')
+              end
+            )
           #   tracked_attribute_writer_methods << %(
           #     def #{attribute}=(value)
           #       detail.send('#{attribute}=', value)
           #     end
           #   )
-          # end
+          end
           
           class_eval <<-EOV
             after_save :create_dated_detail
 
             has_many :dated_details, :class_name => "#{acts_as_dated_detail_class.to_s}", :foreign_key => 'parent_id'
-            
+
+            #{tracked_attribute_reader_methods}
+
             include ActiveRecord::Acts::Dated::InstanceMethods
           EOV
         end

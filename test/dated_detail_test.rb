@@ -19,6 +19,7 @@ def setup_db
     end
 
     create_table :super_hero_dated_details do |t|
+      # Ensure any attributes added here are added to relevant tests (search for 'strength')
       t.column :parent_id, :integer
       t.column :start_on, :datetime
       t.column :end_on, :datetime
@@ -104,9 +105,17 @@ class ParentTest < Test::Unit::TestCase
     assert_equal superhero, SuperHeroDatedDetail.first.parent
   end
   
-  def test_read_attribute
-    # dated_detail = SuperHeroDatedDetail.first(:conditions => "superhero_id = #{@unchanged_superhero.id}")
-    # assert_equal dated_detail.strength, @unchanged_superhero.strength
+  def test_read_tracked_attributes
+    # Ensure value from dated_detail is returned
+    superhero = SuperHero.create!
+    dated_detail = superhero.dated_detail
+    superhero.stubs(:dated_detail).returns(dated_detail)
+    SuperHeroDatedDetail.tracked_attributes.each do |attribute|
+      value = "#{attribute} value"
+      SuperHeroDatedDetail.any_instance.stubs(attribute).returns("Error")
+      dated_detail.stubs(attribute).returns(value)
+      assert_equal value, superhero.send(attribute)
+    end
   end
   
   def test_write_attribute
