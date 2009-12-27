@@ -20,6 +20,8 @@ def setup_db
 
     create_table :super_hero_dated_details do |t|
       t.column :parent_id, :integer
+      t.column :start_on, :datetime
+      t.column :end_on, :datetime
       t.column :strength, :integer
       t.column :created_at, :datetime
       t.column :updated_at, :datetime
@@ -120,6 +122,18 @@ class DatedDetailTest < Test::Unit::TestCase
 
   def teardown
     teardown_db
+  end
+  
+  # Initial Values
+  
+  def test_initial_start_on_value
+    superhero = SuperHero.create!
+    assert_equal Time.now.to_i, SuperHeroDatedDetail.first.start_on.to_i
+  end
+  
+  def test_initial_end_on_value
+    superhero = SuperHero.create!
+    assert_nil SuperHeroDatedDetail.first.end_on
   end
   
   # Tracked Attributes
