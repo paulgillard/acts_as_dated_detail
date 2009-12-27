@@ -111,15 +111,20 @@ class ParentTest < Test::Unit::TestCase
     dated_detail = superhero.dated_detail
     superhero.stubs(:dated_detail).returns(dated_detail)
     SuperHeroDatedDetail.tracked_attributes.each do |attribute|
-      value = "#{attribute} value"
+      value = 10
       SuperHeroDatedDetail.any_instance.stubs(attribute).returns("Error")
       dated_detail.stubs(attribute).returns(value)
       assert_equal value, superhero.send(attribute)
     end
   end
   
-  def test_write_attribute
-    
+  def test_write_tracked_attributes
+    superhero = SuperHero.create!
+    SuperHeroDatedDetail.tracked_attributes.each do |attribute|
+      value = 10
+      superhero.send("#{attribute}=", value)
+      assert_equal value, superhero.dated_detail.send(attribute)
+    end
   end
   
   def test_updating_attribute_creates_new_dated_detail

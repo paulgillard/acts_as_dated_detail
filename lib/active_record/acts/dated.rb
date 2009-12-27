@@ -10,18 +10,18 @@ module ActiveRecord
           acts_as_dated_detail_class = "#{self.name}DatedDetail".constantize
           
           tracked_attribute_reader_methods = ''
-          # tracked_attribute_writer_methods = ''
+          tracked_attribute_writer_methods = ''
           acts_as_dated_detail_class.tracked_attributes.each do |attribute|
             tracked_attribute_reader_methods << %(
               def #{attribute}
                 dated_detail.send('#{attribute}')
               end
             )
-          #   tracked_attribute_writer_methods << %(
-          #     def #{attribute}=(value)
-          #       detail.send('#{attribute}=', value)
-          #     end
-          #   )
+            tracked_attribute_writer_methods << %(
+              def #{attribute}=(value)
+                dated_detail.send('#{attribute}=', value)
+              end
+            )
           end
           
           class_eval <<-EOV
@@ -30,6 +30,7 @@ module ActiveRecord
             has_many :dated_details, :class_name => "#{acts_as_dated_detail_class.to_s}", :foreign_key => 'parent_id'
 
             #{tracked_attribute_reader_methods}
+            #{tracked_attribute_writer_methods}
 
             include ActiveRecord::Acts::Dated::InstanceMethods
           EOV
@@ -38,7 +39,7 @@ module ActiveRecord
       
       module InstanceMethods
         def dated_detail
-          dated_details.first
+          @dated_detail ||= dated_details.first
         end
         
         private
