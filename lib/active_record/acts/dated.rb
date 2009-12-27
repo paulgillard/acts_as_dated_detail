@@ -44,10 +44,11 @@ module ActiveRecord
         
         def on=(time)
           @time = time
+          @dated_detail = nil
         end
         
         def dated_detail
-          @dated_detail ||= dated_details.first || dated_details.build
+          @dated_detail ||= dated_details.on(on).first || dated_details.build
         end
         
         private

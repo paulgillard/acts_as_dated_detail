@@ -12,11 +12,25 @@ module ActiveRecord
 
             before_update :split!
 
+            named_scope :on, lambda { |time| { :conditions => "\#{start_on_or_before_condition(time)} AND \#{end_on_or_after_condition(time)}" } }
+
             def self.tracked_attributes
               columns_hash.keys - ['id', 'parent_id', 'start_on', 'end_on', 'created_at', 'updated_at']
             end
 
             include ActiveRecord::Acts::DatedDetail::InstanceMethods
+
+            private
+
+            # Find all records starting on or before given time
+            def self.start_on_or_before_condition(time)
+              "(start_on <= '\#{time.to_s :db}')"
+            end
+
+            # Find all records ending on or after given time
+            def self.end_on_or_after_condition(time)
+              "(end_on IS NULL OR end_on >= '\#{time.to_s :db}')"
+            end
           EOV
         end
       end

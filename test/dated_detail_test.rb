@@ -52,16 +52,40 @@ end
 
 teardown_db
 
-class ParentTest < Test::Unit::TestCase
+class ActsAsDatedDetailTest < Test::Unit::TestCase
   def setup
     setup_db
-    # create_superhero_with_dated_detail
   end
 
   def teardown
     teardown_db
   end
   
+  def default_test
+  end
+  
+  private
+  
+  def create_superhero(times)
+    first_time = times.shift
+    now = Time.now
+    Time.stubs(:now).returns(first_time)
+    puts now - first_time
+    superhero = SuperHero.create!(:strength => strength(first_time))
+    times.each do |time|
+      Time.stubs(:now).returns(time)
+      superhero.update_attribute(:strength, strength(time))
+    end
+    Time.stubs(:now).returns(now)
+    superhero
+  end
+  
+  def strength(time)
+    time.to_i
+  end
+end
+
+class ParentTest < ActsAsDatedDetailTest
   # Creation
   
   def test_related_dated_detail_created_along_with_model
@@ -69,7 +93,7 @@ class ParentTest < Test::Unit::TestCase
     assert_equal 1, superhero.dated_details.count
   end
   
-  # Currently effective timestamp
+  # Currently Effective Timestamp
   
   def test_default_value_of_currently_effective_timestamp
     now = Time.now
@@ -87,12 +111,24 @@ class ParentTest < Test::Unit::TestCase
     assert_equal one_month_ago, superhero.on
   end
   
-  # Dated Detail
+  # Tracked Attribute Retrieval
   
-  # TODO: We'll correct this to fetch dated detail as of current timestamp at a future date
-  def test_dated_detail
-    superhero = SuperHero.create!
-    assert_equal superhero.dated_details.first, superhero.dated_detail
+  def test_tracked_attribute_for_oldest_timestamp_set_by_instance_method
+    superhero = create_superhero([1.year.ago, 6.months.ago, 1.month.ago])
+    superhero.on = 8.months.ago
+    assert_equal strength(1.year.ago), superhero.strength
+  end
+  
+  def test_tracked_attribute_for_middle_timestamp_set_by_instance_method
+    superhero = create_superhero([1.year.ago, 6.months.ago, 1.month.ago])
+    superhero.on = 5.months.ago
+    assert_equal strength(6.months.ago), superhero.strength
+  end
+  
+  def test_tracked_attribute_for_newest_timestamp_set_by_instance_method
+    superhero = create_superhero([1.year.ago, 6.months.ago, 1.month.ago])
+    superhero.on = 2.weeks.ago
+    assert_equal strength(1.month.ago), superhero.strength
   end
 
   # def test_start_on
@@ -147,7 +183,7 @@ class ParentTest < Test::Unit::TestCase
     end
   end
   
-  # Updating Tracked Attributes
+  # Updating Attributes
   
   def test_updating_tracked_attribute
     now = Time.now
@@ -168,7 +204,7 @@ class ParentTest < Test::Unit::TestCase
   end
 end
 
-class DatedDetailTest < Test::Unit::TestCase
+class DatedDetailTest < ActsAsDatedDetailTest
   def setup
     setup_db
     # create_superhero_with_dated_detail
@@ -239,5 +275,22 @@ class DatedDetailTest < Test::Unit::TestCase
   
   def test_tracked_attributes_excludes_parent_id
     assert !SuperHeroDatedDetail.tracked_attributes.include?('parent_id')
+  end
+  
+  # Dated Detail Retrieval
+  
+  def test_dated_detail_for_oldest_timestamp_retrieved_via_named_scope
+    superhero = create_superhero([1.year.ago, 6.months.ago, 1.month.ago])
+    assert_equal strength(1.year.ago), superhero.dated_details.on(8.months.ago).first.strength
+  end
+  
+  def test_tracked_attribute_for_middle_timestamp_retrieved_via_named_scope
+    superhero = create_superhero([1.year.ago, 6.months.ago, 1.month.ago])
+    assert_equal strength(6.months.ago), superhero.dated_details.on(5.months.ago).first.strength
+  end
+  
+  def test_tracked_attribute_for_newest_timestamp_retrieved_via_named_scope
+    superhero = create_superhero([1.year.ago, 6.months.ago, 1.month.ago])
+    assert_equal strength(1.month.ago), superhero.dated_details.on(2.weeks.ago).first.strength
   end
 end
