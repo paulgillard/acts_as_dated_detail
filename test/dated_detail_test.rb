@@ -13,7 +13,7 @@ ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => ":me
 def setup_db
   ActiveRecord::Schema.define(:version => 1) do
     create_table :super_heros do |t|
-      # Might want to include untracked columns
+      t.column :name, :string
       t.column :created_at, :datetime
       t.column :updated_at, :datetime
     end
@@ -100,10 +100,10 @@ class ParentTest < Test::Unit::TestCase
   
   def test_related_dated_detail_created_along_with_model
     superhero = SuperHero.create!
-    assert_equal 1, SuperHero.count
-    assert_equal 1, SuperHeroDatedDetail.count
-    assert_equal superhero, SuperHeroDatedDetail.first.parent
+    assert_equal 1, superhero.dated_details.count
   end
+  
+  # Tracked Attribute Methods
   
   def test_read_tracked_attributes
     # Ensure value from dated_detail is returned
@@ -127,8 +127,24 @@ class ParentTest < Test::Unit::TestCase
     end
   end
   
-  def test_updating_attribute_creates_new_dated_detail
-    
+  # Updating Tracked Attributes
+  
+  def test_updating_tracked_attribute
+    now = Time.now
+    Time.stubs(:now).returns(now - 1.year)
+    superhero = SuperHero.create!
+    Time.stubs(:now).returns(now)
+    superhero.update_attribute(:strength, 10)
+    assert_equal 2, superhero.dated_details.count
+  end
+  
+  def test_updating_untracked_attribute
+    now = Time.now
+    Time.stubs(:now).returns(now - 1.year)
+    superhero = SuperHero.create!
+    Time.stubs(:now).returns(now)
+    superhero.update_attribute(:name, 'Batman')
+    assert_equal 1, superhero.dated_details.count
   end
   
   def test_updating_attribute_sets_end_date_for_previous_dated_detail

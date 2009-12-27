@@ -25,7 +25,7 @@ module ActiveRecord
           end
           
           class_eval <<-EOV
-            after_save :create_dated_detail
+            after_save :save_dated_detail
 
             has_many :dated_details, :class_name => "#{acts_as_dated_detail_class.to_s}", :foreign_key => 'parent_id'
 
@@ -39,13 +39,13 @@ module ActiveRecord
       
       module InstanceMethods
         def dated_detail
-          @dated_detail ||= dated_details.first
+          @dated_detail ||= dated_details.first || dated_details.build
         end
         
         private
         
-        def create_dated_detail
-          dated_details.create!
+        def save_dated_detail
+          dated_detail.save!
         end
       end
     end
