@@ -21,6 +21,8 @@ def setup_db
     create_table :super_hero_dated_details do |t|
       t.column :parent_id, :integer
       t.column :strength, :integer
+      t.column :created_at, :datetime
+      t.column :updated_at, :datetime
     end
   end
 end
@@ -47,7 +49,7 @@ end
 
 teardown_db
 
-class DatedDetailTest < Test::Unit::TestCase
+class ParentTest < Test::Unit::TestCase
   def setup
     setup_db
     # create_superhero_with_dated_detail
@@ -107,5 +109,46 @@ class DatedDetailTest < Test::Unit::TestCase
   
   def test_updating_attribute_sets_end_date_for_previous_dated_detail
     
+  end
+end
+
+class DatedDetailTest < Test::Unit::TestCase
+  def setup
+    setup_db
+    # create_superhero_with_dated_detail
+  end
+
+  def teardown
+    teardown_db
+  end
+  
+  # Tracked Attributes
+  
+  def test_tracked_attributes_includes_relevant_columns
+    assert SuperHeroDatedDetail.tracked_attributes.include?('strength')
+  end
+  
+  def test_tracked_attributes_excludes_id
+    assert !SuperHeroDatedDetail.tracked_attributes.include?('id')
+  end
+  
+  def test_tracked_attributes_excludes_start_on
+    assert !SuperHeroDatedDetail.tracked_attributes.include?('start_on')
+  end
+  
+  def test_tracked_attributes_excludes_end_on
+    assert !SuperHeroDatedDetail.tracked_attributes.include?('end_on')
+  end
+  
+  def test_tracked_attributes_excludes_updated_at
+    assert !SuperHeroDatedDetail.tracked_attributes.include?('updated_at')
+  end
+  
+  def test_tracked_attributes_excludes_created_at
+    assert !SuperHeroDatedDetail.tracked_attributes.include?('created_at')
+  end
+  
+  def test_tracked_attributes_excludes_parent_id
+    assert !SuperHeroDatedDetail.tracked_attributes.include?('parent_id')
   end
 end
