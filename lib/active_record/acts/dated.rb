@@ -35,6 +35,10 @@ module ActiveRecord
       end
       
       module InstanceMethods
+        def dated_detail
+          dated_details.first
+        end
+        
         private
         
         def create_dated_detail

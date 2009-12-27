@@ -60,6 +60,14 @@ class ParentTest < Test::Unit::TestCase
   def teardown
     teardown_db
   end
+  
+  # Dated Detail
+  
+  # TODO: We'll correct this to fetch dated detail as of current timestamp at a future date
+  def test_dated_detail
+    superhero = SuperHero.create!
+    assert_equal superhero.dated_details.first, superhero.dated_detail
+  end
 
   # def test_start_on
   #   
