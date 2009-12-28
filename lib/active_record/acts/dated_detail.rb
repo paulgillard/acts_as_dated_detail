@@ -28,7 +28,12 @@ module ActiveRecord
         end
         
         def split!
-          self.clone.save if changed?
+          if changed?
+            self.start_on = Time.now
+            original = self.class.find(id).clone
+            original.end_on = start_on - 1
+            original.save!
+          end
         end
       end
     end

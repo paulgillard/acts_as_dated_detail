@@ -62,6 +62,13 @@ class ParentTest < Test::Unit::TestCase
     teardown_db
   end
   
+  # Creation
+  
+  def test_related_dated_detail_created_along_with_model
+    superhero = SuperHero.create!
+    assert_equal 1, superhero.dated_details.count
+  end
+  
   # Dated Detail
   
   # TODO: We'll correct this to fetch dated detail as of current timestamp at a future date
@@ -97,11 +104,6 @@ class ParentTest < Test::Unit::TestCase
   # def test_next_for_last_dated_detail
   #   
   # end
-  
-  def test_related_dated_detail_created_along_with_model
-    superhero = SuperHero.create!
-    assert_equal 1, superhero.dated_details.count
-  end
   
   # Tracked Attribute Methods
   
@@ -146,10 +148,6 @@ class ParentTest < Test::Unit::TestCase
     superhero.update_attribute(:name, 'Batman')
     assert_equal 1, superhero.dated_details.count
   end
-  
-  def test_updating_attribute_sets_end_date_for_previous_dated_detail
-    
-  end
 end
 
 class DatedDetailTest < Test::Unit::TestCase
@@ -162,7 +160,7 @@ class DatedDetailTest < Test::Unit::TestCase
     teardown_db
   end
   
-  # Initial Values
+  # Creation
   
   def test_initial_start_on_value
     superhero = SuperHero.create!
@@ -172,6 +170,27 @@ class DatedDetailTest < Test::Unit::TestCase
   def test_initial_end_on_value
     superhero = SuperHero.create!
     assert_nil SuperHeroDatedDetail.first.end_on
+  end
+  
+  # Updating
+  
+  def test_updating
+    now = Time.now
+    Time.stubs(:now).returns(now - 1.year)
+    superhero = SuperHero.create!
+    Time.stubs(:now).returns(now)
+    
+    dated_detail = superhero.dated_detail
+    original_dated_detail = dated_detail.class.find(dated_detail.id) # Cloning would keep millisecond parts of time which would make later comparisons harder
+    
+    dated_detail.update_attribute(:strength, 10)
+    
+    assert_equal now.to_i, dated_detail.start_on.to_i
+    assert_nil dated_detail.end_on
+    
+    previous_dated_detail = SuperHeroDatedDetail.find_by_start_on(original_dated_detail.start_on)
+    assert_equal dated_detail.start_on.to_i - 1, previous_dated_detail.end_on.to_i
+    assert_equal original_dated_detail.attributes.except('end_on', 'id'), previous_dated_detail.attributes.except('end_on', 'id')
   end
   
   # Tracked Attributes
