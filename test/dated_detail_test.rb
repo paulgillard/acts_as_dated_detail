@@ -69,6 +69,24 @@ class ParentTest < Test::Unit::TestCase
     assert_equal 1, superhero.dated_details.count
   end
   
+  # Currently effective timestamp
+  
+  def test_default_value_of_currently_effective_timestamp
+    now = Time.now
+    Time.stubs(:now).returns(now)
+    superhero = SuperHero.create!
+    assert_equal Time.now, superhero.on
+  end
+  
+  def test_setting_value_of_currently_effective_timestamp
+    now = Time.now
+    Time.stubs(:now).returns(now)
+    superhero = SuperHero.create!
+    one_month_ago = Time.now - 1.month
+    superhero.on = one_month_ago
+    assert_equal one_month_ago, superhero.on
+  end
+  
   # Dated Detail
   
   # TODO: We'll correct this to fetch dated detail as of current timestamp at a future date

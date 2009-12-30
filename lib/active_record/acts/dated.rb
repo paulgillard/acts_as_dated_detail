@@ -38,6 +38,14 @@ module ActiveRecord
       end
       
       module InstanceMethods
+        def on
+          @time ||= Time.now
+        end
+        
+        def on=(time)
+          @time = time
+        end
+        
         def dated_detail
           @dated_detail ||= dated_details.first || dated_details.build
         end
