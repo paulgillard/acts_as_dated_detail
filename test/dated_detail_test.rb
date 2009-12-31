@@ -6,7 +6,7 @@ require 'active_record'
 require 'mocha'
 require 'ruby-debug'
 
-require "#{File.dirname(__FILE__)}/../init"
+require "#{File.dirname(__FILE__)}/../lib/acts_as_dated_detail"
 
 ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => ":memory:")
 
