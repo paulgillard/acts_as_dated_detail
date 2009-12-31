@@ -27,7 +27,7 @@ module ActiveRecord
           class_eval <<-EOV
             after_save :save_dated_detail
 
-            has_many :dated_details, :class_name => "#{acts_as_dated_detail_class.to_s}", :foreign_key => 'parent_id'
+            has_many :dated_details, :class_name => "#{acts_as_dated_detail_class.to_s}"
 
             #{tracked_attribute_reader_methods}
             #{tracked_attribute_writer_methods}

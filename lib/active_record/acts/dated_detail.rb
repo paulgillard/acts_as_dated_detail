@@ -15,7 +15,7 @@ module ActiveRecord
             named_scope :on, lambda { |time| { :conditions => "\#{start_on_or_before_condition(time)} AND \#{end_on_or_after_condition(time)}" } }
 
             def self.tracked_attributes
-              columns_hash.keys - ['id', 'parent_id', 'start_on', 'end_on', 'created_at', 'updated_at']
+              columns_hash.keys - ['id', "#{self.name.underscore.sub(/dated_detail$/, 'id')}", 'start_on', 'end_on', 'created_at', 'updated_at']
             end
 
             include ActiveRecord::Acts::DatedDetail::InstanceMethods

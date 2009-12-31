@@ -20,7 +20,7 @@ def setup_db
 
     create_table :super_hero_dated_details do |t|
       # Ensure any attributes added here are added to relevant tests (search for 'strength')
-      t.column :parent_id, :integer
+      t.column :super_hero_id, :integer
       t.column :start_on, :datetime
       t.column :end_on, :datetime
       t.column :strength, :integer
@@ -274,7 +274,7 @@ class DatedDetailTest < ActsAsDatedDetailTest
   end
   
   def test_tracked_attributes_excludes_parent_id
-    assert !SuperHeroDatedDetail.tracked_attributes.include?('parent_id')
+    assert !SuperHeroDatedDetail.tracked_attributes.include?('super_hero_id')
   end
   
   # Dated Detail Retrieval
