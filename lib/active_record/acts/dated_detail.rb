@@ -8,7 +8,7 @@ module ActiveRecord
       module ClassMethods
         def acts_as_dated_detail()
           class_eval <<-EOV
-#            belongs_to :parent, :class_name => "#{self.name.sub(/DatedDetail$/, '')}"
+            belongs_to :#{self.name.underscore.sub(/_dated_detail$/, '')}
 
             before_update :split!
 

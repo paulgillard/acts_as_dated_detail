@@ -66,11 +66,10 @@ class ActsAsDatedDetailTest < Test::Unit::TestCase
   
   private
   
-  def create_superhero(times)
+  def create_superhero(times = [Time.now])
     first_time = times.shift
     now = Time.now
     Time.stubs(:now).returns(first_time)
-    puts now - first_time
     superhero = SuperHero.create!(:strength => strength(first_time))
     times.each do |time|
       Time.stubs(:now).returns(time)
@@ -212,6 +211,12 @@ class DatedDetailTest < ActsAsDatedDetailTest
 
   def teardown
     teardown_db
+  end
+  
+  # Associations
+  
+  def test_belongs_to_parent
+    assert_equal create_superhero, SuperHeroDatedDetail.first.super_hero
   end
   
   # Creation
