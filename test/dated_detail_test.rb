@@ -209,6 +209,7 @@ class ParentTest < ActsAsDatedDetailTest
     PirateDatedDetail.tracked_attributes.each do |attribute|
       value = 10
       pirate.send("#{attribute}=", value)
+      assert_equal value, pirate.attributes[attribute]
       assert_equal value, pirate.dated_detail.send(attribute)
     end
   end

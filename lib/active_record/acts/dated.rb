@@ -19,6 +19,7 @@ module ActiveRecord
             )
             tracked_attribute_writer_methods << %(
               def #{attribute}=(value)
+                write_attribute('#{attribute}', value)
                 dated_detail.send('#{attribute}=', value)
               end
             )
