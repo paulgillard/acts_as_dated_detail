@@ -119,7 +119,7 @@ class ParentTest < ActsAsDatedDetailTest
   # Creation
   
   def test_related_dated_detail_created_along_with_model
-    pirate = Pirate.create!
+    pirate = create_pirate
     assert_equal 1, pirate.dated_details.count
   end
   
@@ -128,14 +128,14 @@ class ParentTest < ActsAsDatedDetailTest
   def test_default_value_of_currently_effective_timestamp
     now = Time.now
     Time.stubs(:now).returns(now)
-    pirate = Pirate.create!
+    pirate = create_pirate
     assert_equal Time.now, pirate.on
   end
   
   def test_setting_value_of_currently_effective_timestamp
     now = Time.now
     Time.stubs(:now).returns(now)
-    pirate = Pirate.create!
+    pirate = create_pirate
     one_month_ago = Time.now - 1.month
     pirate.on = one_month_ago
     assert_equal one_month_ago, pirate.on
@@ -193,7 +193,7 @@ class ParentTest < ActsAsDatedDetailTest
   
   def test_read_tracked_attributes
     # Ensure value from dated_detail is returned
-    pirate = Pirate.create!
+    pirate = create_pirate
     dated_detail = pirate.dated_detail
     pirate.stubs(:dated_detail).returns(dated_detail)
     PirateDatedDetail.tracked_attributes.each do |attribute|
@@ -205,7 +205,7 @@ class ParentTest < ActsAsDatedDetailTest
   end
   
   def test_write_tracked_attributes
-    pirate = Pirate.create!
+    pirate = create_pirate
     PirateDatedDetail.tracked_attributes.each do |attribute|
       value = 10
       pirate.send("#{attribute}=", value)
@@ -218,7 +218,7 @@ class ParentTest < ActsAsDatedDetailTest
   def test_updating_tracked_integer_attribute
     now = Time.now
     Time.stubs(:now).returns(now - 1.year)
-    pirate = Pirate.create!
+    pirate = create_pirate
     Time.stubs(:now).returns(now)
     pirate.update_attribute(:ruthlessness, 10)
     assert_equal 2, pirate.dated_details.count
@@ -227,7 +227,7 @@ class ParentTest < ActsAsDatedDetailTest
   def test_updating_tracked_string_attribute
     now = Time.now
     Time.stubs(:now).returns(now - 1.year)
-    pirate = Pirate.create!
+    pirate = create_pirate
     Time.stubs(:now).returns(now)
     pirate.update_attribute(:catchphrase, 'Yar!')
     assert_equal 2, pirate.dated_details.count
@@ -255,7 +255,7 @@ class ParentTest < ActsAsDatedDetailTest
   def test_updating_untracked_attribute
     now = Time.now
     Time.stubs(:now).returns(now - 1.year)
-    pirate = Pirate.create!
+    pirate = create_pirate
     Time.stubs(:now).returns(now)
     pirate.update_attribute(:name, 'Long John Silver')
     assert_equal 1, pirate.dated_details.count
@@ -281,29 +281,26 @@ class DatedDetailTest < ActsAsDatedDetailTest
   # Creation
   
   def test_initial_start_on_value
-    pirate = Pirate.create!
+    pirate = create_pirate
     assert_equal Time.now.to_i, PirateDatedDetail.first.start_on.to_i
   end
   
   def test_initial_end_on_value
-    pirate = Pirate.create!
+    pirate = create_pirate
     assert_nil PirateDatedDetail.first.end_on
   end
   
   # Updating
   
   def test_updating
-    now = Time.now
-    Time.stubs(:now).returns(now - 1.year)
-    pirate = Pirate.create!
-    Time.stubs(:now).returns(now)
+    pirate = create_pirate([Time.now - 1.year])
     
     dated_detail = pirate.dated_detail
     original_dated_detail = dated_detail.class.find(dated_detail.id) # Cloning would keep millisecond parts of time which would make later comparisons harder
     
     dated_detail.update_attribute(:ruthlessness, 10)
     
-    assert_equal now.to_i, dated_detail.start_on.to_i
+    assert_equal Time.now.to_i, dated_detail.start_on.to_i
     assert_nil dated_detail.end_on
     
     previous_dated_detail = PirateDatedDetail.find_by_start_on(original_dated_detail.start_on)
