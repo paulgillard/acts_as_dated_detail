@@ -33,6 +33,14 @@ module ActiveRecord
             #{tracked_attribute_writer_methods}
 
             include ActiveRecord::Acts::Dated::InstanceMethods
+            
+#            def self.columns
+#              tracked_columns_hash = #{acts_as_dated_detail_class.to_s}.columns_hash.slice(*#{acts_as_dated_detail_class.to_s}.tracked_attributes)
+#              @columns ||= tracked_columns_hash.inject(super.columns) do |columns, (key, value)|
+#                columns << value
+#              end
+#              @columns
+#            end
           EOV
         end
       end

@@ -20,6 +20,10 @@ def setup_db
 
     create_table :pirates do |t|
       t.column :name, :string
+      t.column :catchphrase, :string
+      t.column :ruthlessness, :integer
+      t.column :birth_date, :datetime
+      t.column :parrot_id, :integer
       t.column :created_at, :datetime
       t.column :updated_at, :datetime
     end
