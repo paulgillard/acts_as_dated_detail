@@ -192,34 +192,29 @@ class ParentTest < ActsAsDatedDetailTest
     pirate.on = 2.weeks.ago
     assert_equal catchphrase(1.month.ago), pirate.catchphrase
   end
-
-  # def test_start_on
-  #   
-  # end
-  # 
-  # def test_end_on
-  #   
-  # end
-  # 
-  # def test_end_on_for_last_dated_detail
-  #   
-  # end
-  # 
-  # def test_previous
-  #   
-  # end
-  # 
-  # def test_previous_for_first_dated_detail
-  #   
-  # end
-  # 
-  # def test_next
-  #   
-  # end
-  # 
-  # def test_next_for_last_dated_detail
-  #   
-  # end
+  
+  # Reloading
+  
+  def test_reloading_when_tracking_latest_history
+    pirate = create_pirate([1.hour.ago])
+    same_pirate = Pirate.find(pirate.id)
+    new_ruthlessness = 999 #same_pirate.ruthlessness + 1
+    same_pirate.update_attribute(:ruthlessness, new_ruthlessness)
+    flunk 'Pirate must be tracking latest history' unless pirate.current?
+    pirate.reload
+    assert_equal new_ruthlessness, pirate.ruthlessness
+  end
+  
+  def test_reloading_when_not_tracking_latest_history
+    pirate = create_pirate([6.months.ago, 1.hour.ago])
+    pirate.on = 5.months.ago
+    ruthlessness = pirate.ruthlessness
+    same_pirate = Pirate.find(pirate.id)
+    same_pirate.update_attribute(:ruthlessness, same_pirate.ruthlessness + 1)
+    flunk 'Pirate must not be tracking latest history' if pirate.current?
+    pirate.reload
+    assert_equal ruthlessness, pirate.ruthlessness
+  end
   
   # Tracked Attribute Methods
   

@@ -35,6 +35,8 @@ module ActiveRecord
 
             include ActiveRecord::Acts::Dated::InstanceMethods
             
+            alias_method_chain :reload, :dated_detail
+            
 #            def self.columns
 #              tracked_columns_hash = #{acts_as_dated_detail_class.to_s}.columns_hash.slice(*#{acts_as_dated_detail_class.to_s}.tracked_attributes)
 #              @columns ||= tracked_columns_hash.inject(super.columns) do |columns, (key, value)|
@@ -47,6 +49,8 @@ module ActiveRecord
       end
       
       module InstanceMethods
+        
+        
         def on
           @time ||= Time.now
         end
@@ -69,6 +73,14 @@ module ActiveRecord
           @fixed_time = false
           @dated_detail = nil
           @time = nil
+        end
+        
+        def reload_with_dated_detail
+          reload_without_dated_detail
+          if current?
+            @dated_detail = nil
+            @time = nil
+          end
         end
         
         private
