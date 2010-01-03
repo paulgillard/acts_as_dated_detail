@@ -98,6 +98,7 @@ class ActsAsDatedDetailTest < Test::Unit::TestCase
       Time.stubs(:now).returns(time)
       pirate.update_attributes(:name => pirate_name(time), :catchphrase => catchphrase(time), :ruthlessness => ruthlessness(time), :birth_date => time, :parrot => create_parrot(time))
     end
+    # A lot of tests rely on this method stubbing Time.now
     Time.stubs(:now).returns(now)
     pirate
   end
@@ -127,14 +128,11 @@ class ParentTest < ActsAsDatedDetailTest
   
   def test_default_value_of_currently_effective_timestamp
     now = Time.now
-    Time.stubs(:now).returns(now)
-    pirate = create_pirate
-    assert_equal Time.now, pirate.on
+    pirate = create_pirate([now])
+    assert_equal now, pirate.on
   end
   
   def test_setting_value_of_currently_effective_timestamp
-    now = Time.now
-    Time.stubs(:now).returns(now)
     pirate = create_pirate
     one_month_ago = Time.now - 1.month
     pirate.on = one_month_ago
@@ -244,55 +242,38 @@ class ParentTest < ActsAsDatedDetailTest
   # Updating Attributes
   
   def test_updating_tracked_attribute_updates_currently_effective_timestamp
-    now = Time.now
-    Time.stubs(:now).returns(now)
     pirate = create_pirate([1.year.ago])
     pirate.update_attribute(:catchphrase, 'Yar!')
-    assert_equal now, pirate.on
+    assert_equal Time.now, pirate.on
   end
   
   def test_updating_tracked_integer_attribute
-    now = Time.now
-    Time.stubs(:now).returns(now - 1.year)
-    pirate = create_pirate
-    Time.stubs(:now).returns(now)
+    pirate = create_pirate([1.year.ago])
     pirate.update_attribute(:ruthlessness, 10)
     assert_equal 2, pirate.dated_details.count
   end
   
   def test_updating_tracked_string_attribute
-    now = Time.now
-    Time.stubs(:now).returns(now - 1.year)
-    pirate = create_pirate
-    Time.stubs(:now).returns(now)
+    pirate = create_pirate([1.year.ago])
     pirate.update_attribute(:catchphrase, 'Yar!')
     assert_equal 2, pirate.dated_details.count
   end
   
   def test_updating_tracked_datetime_attribute
-    now = Time.now
-    Time.stubs(:now).returns(now - 1.year)
-    pirate = create_pirate
-    Time.stubs(:now).returns(now)
+    pirate = create_pirate([1.year.ago])
     pirate.update_attributes(:birth_date => pirate.birth_date + 1.day)
     assert_equal 2, pirate.dated_details.count
   end
   
   def test_updating_tracked_multiparameter_attribute
-    now = Time.now
-    Time.stubs(:now).returns(now - 1.year)
-    pirate = create_pirate
-    Time.stubs(:now).returns(now)
+    pirate = create_pirate([1.year.ago])
     new_birth_date = pirate.birth_date + 1.day
     pirate.update_attributes('birth_date(1i)' => "#{new_birth_date.year}", 'birth_date(2i)' => "#{new_birth_date.month}", 'birth_date(3i)' => "#{new_birth_date.day}")
     assert_equal 2, pirate.dated_details.count
   end
   
   def test_updating_untracked_attribute
-    now = Time.now
-    Time.stubs(:now).returns(now - 1.year)
-    pirate = create_pirate
-    Time.stubs(:now).returns(now)
+    pirate = create_pirate([1.year.ago])
     pirate.update_attribute(:name, 'Long John Silver')
     assert_equal 1, pirate.dated_details.count
   end
