@@ -1,1 +1,1 @@
-* Remove tracked attribute columns from parent table. They currently only exist to correctly run some forms of updating which rely on ActiveRecord::Base#columns such as updating multiparameter attributes. Try removing the tracked attribute columns from the pirates table in the test suite and run the tests to see an example.
+* Only set @dated_detail = nil when assigning to on when the time being assigned would take it out of the current dated detail's timeframe.

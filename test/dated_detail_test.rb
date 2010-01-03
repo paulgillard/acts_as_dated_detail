@@ -141,6 +141,38 @@ class ParentTest < ActsAsDatedDetailTest
     assert_equal one_month_ago, pirate.on
   end
   
+  # Determining if instance is tracking latest history
+  
+  def test_tracks_latest_history_by_default
+    pirate = create_pirate
+    assert pirate.current?
+  end
+  
+  def test_does_not_track_latest_history_when_currently_effective_timestamp_set
+    [1.day.ago, Time.now].each do |time|
+      pirate = create_pirate
+      pirate.on = time
+      assert !pirate.current?
+    end
+  end
+  
+  def test_does_not_track_latest_history_when_currently_effective_timestamp_reset_to_now
+    pirate = create_pirate
+    pirate.on = 1.day.ago
+    pirate.on = Time.now
+    assert !pirate.current?
+  end
+  
+  # Forcing instance to track latest history again
+  
+  def test_tracks_latest_history_again
+    pirate = create_pirate([1.year.ago, 6.months.ago, 1.month.ago])
+    pirate.on = 6.months.ago
+    pirate.current!
+    assert pirate.current?
+    assert_equal catchphrase(1.month.ago), pirate.catchphrase
+  end
+  
   # Tracked Attribute Retrieval
   
   def test_tracked_attribute_for_oldest_timestamp_set_by_instance_method

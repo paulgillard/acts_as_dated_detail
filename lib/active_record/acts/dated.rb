@@ -53,11 +53,22 @@ module ActiveRecord
         
         def on=(time)
           @time = time
+          @fixed_time = true
           @dated_detail = nil
         end
         
         def dated_detail
           @dated_detail ||= dated_details.on(on).first || dated_details.build
+        end
+        
+        def current?
+          !@fixed_time
+        end
+        
+        def current!
+          @fixed_time = false
+          @dated_detail = nil
+          @time = nil
         end
         
         private
