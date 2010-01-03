@@ -1,1 +1,5 @@
 * Only set @dated_detail = nil when assigning to on when the time being assigned would take it out of the current dated detail's timeframe.
+* Prevent on from being set before the first detail record?
+* Prevent on from being set in the future?
+* Allow deleting the parent to mark it as deleted and retain history?
+* Have next!, previous!, first! and last! convenience methods as shortcuts for setting on directly?
