@@ -76,11 +76,11 @@ module ActiveRecord
         end
         
         def reload_with_dated_detail
-          reload_without_dated_detail
           if current?
             @dated_detail = nil
             @time = nil
           end
+          reload_without_dated_detail
         end
         
         private

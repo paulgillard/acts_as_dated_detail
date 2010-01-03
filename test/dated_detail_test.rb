@@ -214,6 +214,12 @@ class ParentTest < ActsAsDatedDetailTest
     assert_equal ruthlessness, pirate.ruthlessness
   end
   
+  def test_reloading_returns_self
+    # #reload is aliased. Test that it returns correctly
+    pirate = create_pirate
+    assert_equal pirate, pirate.reload
+  end
+  
   # Tracked Attribute Methods
   
   def test_read_tracked_attributes
