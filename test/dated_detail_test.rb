@@ -243,6 +243,14 @@ class ParentTest < ActsAsDatedDetailTest
   
   # Updating Attributes
   
+  def test_updating_tracked_attribute_updates_currently_effective_timestamp
+    now = Time.now
+    Time.stubs(:now).returns(now)
+    pirate = create_pirate([1.year.ago])
+    pirate.update_attribute(:catchphrase, 'Yar!')
+    assert_equal now, pirate.on
+  end
+  
   def test_updating_tracked_integer_attribute
     now = Time.now
     Time.stubs(:now).returns(now - 1.year)

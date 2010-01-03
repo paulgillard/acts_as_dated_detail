@@ -87,6 +87,7 @@ module ActiveRecord
         
         def save_dated_detail
           dated_detail.save!
+          @time = dated_detail.start_on
         end
       end
     end
