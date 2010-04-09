@@ -7,36 +7,27 @@ module ActiveRecord
       
       module ClassMethods
         def acts_as_dated(options = {})
-          acts_as_dated_detail_class = "#{self.name}DatedDetail".constantize
+          acts_as_dated_detail_class_name = "#{self.name}DatedDetail"
           
-          tracked_attribute_reader_methods = ''
-          tracked_attribute_writer_methods = ''
-          acts_as_dated_detail_class.tracked_attributes.each do |attribute|
-            tracked_attribute_reader_methods << %(
-              def #{attribute}
-                dated_detail.send('#{attribute}')
-              end
-            )
-            tracked_attribute_writer_methods << %(
-              def #{attribute}=(value)
-                write_attribute('#{attribute}', value)
-                dated_detail.send('#{attribute}=', value)
-              end
-            )
-          end
-          
-          class_eval <<-EOV
+          class_eval do
             after_save :save_dated_detail
 
-            has_many :dated_details, :class_name => "#{acts_as_dated_detail_class.to_s}"
-
-            #{tracked_attribute_reader_methods}
-            #{tracked_attribute_writer_methods}
+            has_many :dated_details, :class_name => acts_as_dated_detail_class_name
 
             include ActiveRecord::Acts::Dated::InstanceMethods
             
             alias_method_chain :reload, :dated_detail
-            
+
+            acts_as_dated_detail_class_name.constantize.tracked_attributes.each do |attribute|
+              define_method(attribute) do
+                dated_detail.send(attribute)
+              end
+              define_method("#{attribute}=") do |value|
+                write_attribute(attribute, value)
+                dated_detail.send("#{attribute}=", value)
+              end
+            end
+
 #            def self.columns
 #              tracked_columns_hash = #{acts_as_dated_detail_class.to_s}.columns_hash.slice(*#{acts_as_dated_detail_class.to_s}.tracked_attributes)
 #              @columns ||= tracked_columns_hash.inject(super.columns) do |columns, (key, value)|
@@ -44,13 +35,11 @@ module ActiveRecord
 #              end
 #              @columns
 #            end
-          EOV
+          end
         end
       end
       
       module InstanceMethods
-        
-        
         def on
           @time ||= Time.now
         end
