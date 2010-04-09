@@ -4,7 +4,7 @@ http://github.com/paulgillard/acts_as_dated_detail
 
 == DESCRIPTION:
 
-acts_as_dated_detil enables versioning of attributes by timestamp.
+acts_as_dated_detail enables versioning of attributes by timestamp.
 
 == FEATURES:
 
