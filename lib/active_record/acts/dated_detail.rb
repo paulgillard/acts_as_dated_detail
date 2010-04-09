@@ -9,7 +9,8 @@ module ActiveRecord
         def acts_as_dated_detail()
           class_eval <<-EOV
             belongs_to :#{self.name.underscore.sub(/_dated_detail$/, '')}
-
+            
+            before_save :set_start_date
             before_update :split!
 
             named_scope :on, lambda { |time| { :conditions => "\#{start_on_or_before_condition(time)} AND \#{end_on_or_after_condition(time)}" } }
@@ -36,9 +37,8 @@ module ActiveRecord
       end
 
       module InstanceMethods
-        def initialize(*args)
-          super
-          self.start_on = Time.now
+        def set_start_date
+          self.start_on ||= Time.now
         end
         
         def split!
